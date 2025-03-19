@@ -23,7 +23,7 @@ use Illuminate\Support\Facades\Auth;
      *     description="Modelo de una tarea",
      *     @OA\Property(property="id", type="integer", example=1),
      *     @OA\Property(property="user_id", type="integer", example=1), 
-     *     @OA\Property(property="title", type="string", example="Nueva tara"),
+     *     @OA\Property(property="title", type="string", example="Nueva tarea"),
      *     @OA\Property(property="description", type="string", example="Nueva tarea por hacer"),
      *     @OA\Property(property="due_date", type="string", format="date", example="2025-03-30"),
      *     @OA\Property(property="status", type="string", example="pending"),
