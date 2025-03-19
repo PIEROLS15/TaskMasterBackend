@@ -25,6 +25,10 @@ class TaskController extends Controller
     public function store(Request $request)
     {
         try {
+            if (empty($request->input('title')) && empty($request->input('description')) && empty($request->input('due_date'))) {
+                return response()->json(['error' => 'Por favor, completa los campos para crear tu tarea'], 400);
+            }
+
             $request->validate([
                 'title' => 'required|string|max:255',
                 'description' => 'nullable|string',
@@ -37,8 +41,8 @@ class TaskController extends Controller
                         }
                     },
                 ]
-            ],[
-                'title.required' => 'El titulo de la tarea es obligatoria',
+            ], [
+                'title.required' => 'El título de la tarea es obligatorio.',
                 'due_date.required' => 'La fecha de vencimiento es obligatoria.',
                 'due_date.date' => 'La fecha de vencimiento debe ser una fecha válida.',
             ]);
@@ -49,11 +53,12 @@ class TaskController extends Controller
             $task = Auth::user()->tasks()->create($data);
 
             return response()->json($task, 201);
-            
+
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
+
 
 
     public function show(Task $task)
@@ -107,15 +112,19 @@ class TaskController extends Controller
     public function destroy(Task $task)
     {
         try {
+            if (!$task) {
+                return response()->json(['message' => 'La tarea no existe.'], 404);
+            }
             if ($task->user_id !== Auth::id()) {
                 return response()->json(['message' => 'Unauthorized'], 403);
             }
-    
+
             $task->delete();
-    
+
             return response()->json(['message' => 'Tarea eliminada correctamente']);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
+
 }
