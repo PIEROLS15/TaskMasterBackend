@@ -7,8 +7,35 @@ use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 
+/**
+ * @OA\SecurityScheme(
+ *     securityScheme="sanctum",
+ *     type="http",
+ *     scheme="bearer"
+ * )
+ */
+
 class AuthController extends Controller
 {
+    /**
+     * @OA\Post(
+     *     path="/api/register",
+     *     tags={"Autenticación"},
+     *     summary="Registrar un nuevo usuario",
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"name","email","password"},
+     *             @OA\Property(property="name", type="string", example="Piero Llanos"),
+     *             @OA\Property(property="email", type="string", format="email", example="pierodanielllanossanchez@gmail.com"),
+     *             @OA\Property(property="password", type="string", format="password", example="12345678")
+     *         )
+     *     ),
+     *     @OA\Response(response=201, description="Registrado correctamente"),
+     *     @OA\Response(response=422, description="Error en la validación"),
+     *     @OA\Response(response=500, description="Error en el servidor")
+     * )
+     */
     public function register(Request $request)
     {
         try {
@@ -39,7 +66,24 @@ class AuthController extends Controller
             return response()->json(['error' => 'Error en el registro: ' . $e->getMessage()], 500);
         }
     }
-
+    /**
+     * @OA\Post(
+     *     path="/api/login",
+     *     tags={"Autenticación"},
+     *     summary="Iniciar sesión y obtener token",
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"email","password"},
+     *             @OA\Property(property="email", type="string", format="email", example="pierodanielllanossanchez@gmail.com"),
+     *             @OA\Property(property="password", type="string", format="password", example="12345678")
+     *         )
+     *     ),
+     *     @OA\Response(response=200, description="Token de acceso generado"),
+     *     @OA\Response(response=401, description="Credenciales incorrectas"),
+     *     @OA\Response(response=422, description="Error en la validación")
+     * )
+     */
     public function login(Request $request)
     {
         try {
@@ -71,6 +115,16 @@ class AuthController extends Controller
         }
     }
 
+    /**
+     * @OA\Post(
+     *     path="/api/logout",
+     *     tags={"Autenticación"},
+     *     summary="Cerrar sesión y revocar token",
+     *     security={{"sanctum":{}}},
+     *     @OA\Response(response=200, description="Sesión cerrada correctamente"),
+     *     @OA\Response(response=401, description="No autenticado")
+     * )
+     */
     public function logout(Request $request)
     {
         $request->user()->tokens()->delete();
